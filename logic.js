@@ -24,6 +24,47 @@ d3.csv(fire_csv).then(function(data) {
   function markerSize(AcresBurned) {
     return Math.sqrt(AcresBurned) * 100 ;
   }
+
+  // dropdown selection
+
+  d3.selectAll("#selectYear").on("change", updateMap);
+
+  //use selection to update map
+
+   function updateMap() {
+    // Use D3 to select the dropdown menu
+    var dropdownMenu = d3.select("#selectYear");
+    // Assign the value of the dropdown menu option to a variable
+    var yearset = dropdownMenu.property("value");
+
+    // console.log(yearset);
+    //variable for refresh
+    let yearlist = [] ;
+
+    for (var i = 0; i < data.length; i++) {
+     if (data[i].ArchiveYear == yearset) {
+       // push to a layer to draw
+       let fire = L.circle([data[i].Latitude, data[i].Longitude], {
+         fillOpacity: 0.4,
+         color: "turquoise",
+         fillColor: "turquoise",
+       // Setting our circle's radius to equal the output of our markerSize() function:
+         radius: markerSize(data[i].AcresBurned)
+       }).bindPopup(`<h4>Name: ${data[i].FireName}</h4><h5>Duration: ${data[i].Duration}</h5>`)
+       //push to make a layer for display
+       yearlist.push(fire);
+       }
+     else {
+     };
+    };
+    // refresh with new selection
+    myMap.removeLayer(blanky);
+    blanky=L.layerGroup(yearlist);
+    blanky.addTo(myMap);
+  }; 
+
+// end of pull down options
+
   // write data to console
   console.log(data);
 
@@ -32,8 +73,9 @@ d3.csv(fire_csv).then(function(data) {
   var yearfires = [];
   var marker1 = [];
   var dixie = [];
+  var blank = [];
 
-  // loop through daya
+  // loop through data
   for (var i = 0; i < data.length; i++) {
 
     // layer for all fires with marker size acrage burned
@@ -43,7 +85,7 @@ d3.csv(fire_csv).then(function(data) {
         fillColor: "orange",
       // Setting our circle's radius to equal the output of our markerSize() function:
         radius: markerSize(data[i].AcresBurned)
-      }).bindPopup(`<h4>Name: ${data[i].FireName}</h4> <h5>Duration: ${data[i].Duration}</h5>`)
+      }).bindPopup(`<h4>Name: ${data[i].FireName}</h4><h5>Duration: ${data[i].Duration}</h5>`)
       // .addTo(myMap)
     );
 
@@ -71,8 +113,8 @@ d3.csv(fire_csv).then(function(data) {
       color: colory ,
       fillColor: colory ,
      // Setting our circle's radius to equal the output of our markerSize() function:
-      radius: 500
-     }).bindPopup(`<h4>Name: ${data[i].FireName}</h4> <h5>Acres Brunt: ${data[i].AcresBurned}</h5>`)
+      radius: 1000
+     }).bindPopup(`<h4>Name: ${data[i].FireName}</h4> <h5>Year: ${data[i].ArchiveYear}<br>Acres Burnt: ${data[i].AcresBurned}</h5>`)
      // .addTo(myMap)
     );
   //end i loop
@@ -88,6 +130,7 @@ d3.csv(fire_csv).then(function(data) {
   var fires = L.layerGroup(AllFires);
   var firesy = L.layerGroup(yearfires);
   var dixief = L.layerGroup(dixie);
+  var blanky = L.layerGroup(blank);
 
   var overlayMaps = {
   "Near Fresno": mark,
